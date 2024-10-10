@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import HeroProvider from "./features/avitoParser/utils/heroProvider";
 import AvitoCategoryService from "./features/avitoParser/services/avitoCategoryService";
 import Fastify, { FastifyInstance } from 'fastify';
+import fastifyCors from "@fastify/cors";
 import registerAuthRoutes from "./features/api/auth/routes";
 import { fastifyAuthDecorate } from "./features/api/auth/authMiddleware";
 import { registerListingRoutes } from "./features/api/listings/routes";
@@ -30,6 +31,9 @@ async function startServer() {
             error: error.message
         });
     });
+
+    // Register addons
+    await app.register(fastifyCors);
 
     // Register middlewares
     fastifyAuthDecorate();
