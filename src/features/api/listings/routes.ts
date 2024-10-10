@@ -14,6 +14,7 @@ export function registerListingRoutes() {
             isActive?: boolean;
             isIgnored?: boolean;
             isTracking?: boolean;
+            wasChecked?: boolean;
             categoryId?: number;
             search?: string;
             dateFrom?: string,
@@ -33,6 +34,7 @@ export function registerListingRoutes() {
                     isActive: { type: 'boolean', default: true },
                     isIgnored: { type: 'boolean', default: false },
                     isTracking: { type: 'boolean' },
+                    wasChecked: { type: 'boolean' },
                     categoryId: { type: 'integer' },
                     search: { type: 'string' },
                     dateFrom: { type: 'string', format: 'date-time' },
