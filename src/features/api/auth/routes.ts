@@ -4,6 +4,12 @@ import argon2 from 'argon2';
 import crypto from 'crypto';
 
 export default function registerAuthRoutes() {
+    app.get('/api/user/exists', async (_request, reply) => {
+        return reply.code(200).send({
+            exists: config.store.auth.passwordHash !== null
+        });
+    });
+
     app.put<{
         Body: { password: string }
     }>('/api/user/password', {
