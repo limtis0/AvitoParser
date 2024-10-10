@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Listing {
+  id            Int       @id @default(autoincrement())
+  itemId        String    @unique
+
+  url           String
+  title         String
+  price         Int
+  description   String?
+  imageUrl      String
+  address       String
+  brand         String?
+
+  isActive      Boolean   @default(true)
+  isIgnored     Boolean   @default(false)
+  isTracking    Boolean   @default(false)
+  wasChecked    Boolean   @default(false)
+
+  userId        String?
+  postedAt      DateTime
+  updatedAt     DateTime  @updatedAt
+
+  categoryId    Int
+  category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index(fields: [itemId])
+}
+
+model BlockedBrand {
+  name      String    @id
+  reason    String?
+
+  @@index(fields: [name])
+}
+
+model Word {
+  word    String     @id
+  type    WordType
+
+  @@index(fields: [word])
+}
+
+enum WordType {
+  ignored
+  tracked
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  url       String
+  listings  Listing[]
+}

@@ -1,0 +1,54 @@
+import { PrismaClient } from "@prisma/client";
+import HeroProvider from "./features/avitoParser/utils/heroProvider";
+import AvitoCategoryService from "./features/avitoParser/services/avitoCategoryService";
+import Fastify, { FastifyInstance } from 'fastify';
+import registerAuthRoutes from "./features/api/auth/routes";
+import { fastifyAuthDecorate } from "./features/api/auth/authMiddleware";
+import { registerListingRoutes } from "./features/api/listings/routes";
+import { registerWordlistRoutes } from "./features/api/wordlist/routes";
+import { loadWordlists } from "./features/api/wordlist/wordlists";
+import { registerCategoryRoutes } from "./features/api/categories/routes";
+
+export const prisma = new PrismaClient();
+export let app: FastifyInstance;
+
+// Start parser
+async function startServer() {
+    // Load caches
+    await loadWordlists();
+
+    // Load parsers
+    await HeroProvider.startCloudNode();
+    AvitoCategoryService.Start();
+
+    // Setup API
+    app = Fastify();
+
+    app.setErrorHandler((error, request, reply) => {
+        console.error(`Error during request to ${request.url}:`, error);
+        return reply.code(error.statusCode ?? 500).send({
+            error: error.message
+        });
+    });
+
+    // Register middlewares
+    fastifyAuthDecorate();
+
+    // Register routes
+    registerAuthRoutes();
+    registerListingRoutes();
+    registerWordlistRoutes();
+    registerCategoryRoutes();
+
+    // Start API
+    app.listen({ port: 3001 }, (err, address) => {
+        if (err) {
+            console.error(`FATAL: ${err}`)
+            process.exit(1)
+        }
+
+        console.log(`Server is listening at ${address}...`)
+    });
+}
+
+startServer();
