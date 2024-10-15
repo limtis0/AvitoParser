@@ -5,7 +5,7 @@ import { config } from "../../config";
 import HeroProvider from "../utils/heroProvider";
 import AvitoUrlUtils from "../../../utils/avitoUrlUtils";
 import { setTimeout as sleep } from 'timers/promises'
-import { isTextInWordlist, ignoredWordlist, trackedWordlist } from "@/features/api/wordlist/wordlists";
+import { isTextInWordlist, ignoredWordlist, trackedWordlist, ignoredBrandlist } from "@/features/api/wordlist/wordlists";
 
 export default class AvitoCategoryService {
     private static readonly SkipOnNumDuplicates = 20;
@@ -105,7 +105,9 @@ export default class AvitoCategoryService {
 
         let data = listings.map(l => {
             const isTracking = isTextInWordlist(l.title, trackedWordlist);
-            const isIgnored = !isTracking && isTextInWordlist(l.title, ignoredWordlist);
+            const isIgnored = !isTracking && (
+                isTextInWordlist(l.title, ignoredWordlist) || (l.brand !== null && isTextInWordlist(l.brand, ignoredBrandlist))
+            );
 
             return {
                 ...l,

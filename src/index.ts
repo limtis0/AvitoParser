@@ -6,9 +6,10 @@ import fastifyCors from "@fastify/cors";
 import registerAuthRoutes from "./features/api/auth/routes";
 import { fastifyAuthDecorate } from "./features/api/auth/authMiddleware";
 import { registerListingRoutes } from "./features/api/listings/routes";
-import { registerWordlistRoutes } from "./features/api/wordlist/routes";
-import { loadWordlists } from "./features/api/wordlist/wordlists";
+import { registerWordlistRoutes } from "./features/api/wordlist/wordlistRoutes";
+import { loadWordlistCaches } from "./features/api/wordlist/wordlists";
 import { registerCategoryRoutes } from "./features/api/categories/routes";
+import { registerBrandlistRoutes } from "./features/api/wordlist/brandlistRoutes";
 
 export const prisma = new PrismaClient();
 export let app: FastifyInstance;
@@ -16,7 +17,7 @@ export let app: FastifyInstance;
 // Start parser
 async function startServer() {
     // Load caches
-    await loadWordlists();
+    await loadWordlistCaches();
 
     // Load parsers
     await HeroProvider.startCloudNode();
@@ -43,6 +44,7 @@ async function startServer() {
     registerListingRoutes();
     registerWordlistRoutes();
     registerCategoryRoutes();
+    registerBrandlistRoutes();
 
     // Start API
     app.listen({ port: 3001 }, (err, address) => {

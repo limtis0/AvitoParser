@@ -81,7 +81,7 @@ export function registerWordlistRoutes() {
         });
     });
 
-    app.put<{
+    app.post<{
         Params: WordlistParams,
         Body: {
             word: string;
@@ -167,7 +167,7 @@ export function registerWordlistRoutes() {
             }
         });
 
-        words.forEach(w => mainWordlist.remove(w));
+        words.forEach(w => mainWordlist.delete(w));
 
         return reply.code(200).send();
     });
