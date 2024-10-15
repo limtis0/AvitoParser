@@ -10,6 +10,7 @@ import { registerWordlistRoutes } from "./features/api/wordlist/wordlistRoutes";
 import { loadWordlistCaches } from "./features/api/wordlist/wordlists";
 import { registerCategoryRoutes } from "./features/api/categories/routes";
 import { registerBrandlistRoutes } from "./features/api/wordlist/brandlistRoutes";
+import { registerStatRoutes } from "./features/api/stats/routes";
 
 export const prisma = new PrismaClient();
 export let app: FastifyInstance;
@@ -45,6 +46,7 @@ async function startServer() {
     registerWordlistRoutes();
     registerCategoryRoutes();
     registerBrandlistRoutes();
+    registerStatRoutes();
 
     // Start API
     app.listen({ port: 3001 }, (err, address) => {
