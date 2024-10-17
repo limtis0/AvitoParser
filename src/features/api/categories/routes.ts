@@ -13,6 +13,50 @@ const paramsSchema = {
     }
 };
 
+async function getCategoryStats() {
+    const stats: Map<
+        number, {
+            ignored: number,
+            tracking: number
+        }
+    > = new Map();
+
+    const trackingCount = await prisma.listing.groupBy({
+        by: ['categoryId'],
+        _count: true,
+        where: {
+            isTracking: true
+        }
+    });
+
+    trackingCount.forEach((c) => {
+        stats.set(c.categoryId, {
+            tracking: c._count,
+            ignored: 0
+        })
+    });
+
+    // Same for ignored
+    const ignoredCount = await prisma.listing.groupBy({
+        by: ['categoryId'],
+        _count: true,
+        where: {
+            isIgnored: true
+        }
+    });
+
+    ignoredCount.forEach((c) => {
+        const stat = stats.get(c.categoryId);
+
+        stats.set(c.categoryId, {
+            tracking: stat ? stat.tracking : 0,
+            ignored: c._count
+        });
+    });
+
+    return stats;
+}
+
 export function registerCategoryRoutes() {
     app.get('/api/categories', {
         onRequest: [app.auth()]
@@ -28,8 +72,18 @@ export function registerCategoryRoutes() {
             }
         });
 
+        const stats = await getCategoryStats();
+
         return reply.code(200).send({
-            categories: categories
+            categories: categories.map((c) => {
+                const stat = stats.get(c.id);
+
+                return {
+                    ...c,
+                    ignored: stat?.ignored ?? 0,
+                    tracking: stat?.tracking ?? 0
+                }
+            })
         });
     });
 
