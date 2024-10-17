@@ -29,7 +29,7 @@ const ListingSelectors = {
 }
 
 const Regex = {
-    brandUrl: /brands|user\/([a-zA-Z0-9]+)/,
+    brandUrl: /(?:brands|user)\/([a-zA-Z0-9]+)/,
     userIdUrl: /user\/([a-zA-Z0-9]+)\/ratings/
 }
 
@@ -125,7 +125,7 @@ export default class AvitoParser {
             if (brand) {
                 const match = brand.match(Regex.brandUrl);
                 
-                if (match === null) {
+                if (match === null || match[1] === undefined) {
                     console.error(`Could not match brandUrl with regex ${brand}`);
                     brand = null;
                 }
