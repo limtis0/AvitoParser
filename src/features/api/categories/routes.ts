@@ -80,8 +80,8 @@ export function registerCategoryRoutes() {
 
                 return {
                     ...c,
-                    ignored: stat?.ignored ?? 0,
-                    tracking: stat?.tracking ?? 0
+                    ignoredCount: stat?.ignored ?? 0,
+                    trackingCount: stat?.tracking ?? 0
                 }
             })
         });
