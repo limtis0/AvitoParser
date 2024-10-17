@@ -13,10 +13,10 @@ const paramsSchema = {
     }
 };
 
-const statsQuery = 'SELECT ' + 
-    '"categoryId", ' + 
-    'COUNT(*) as total, ' + 
-    'SUM("isTracking"::int) as tracking, ' + 
+const statsQuery = 'SELECT ' +
+    '"categoryId", ' +
+    'COUNT(*) as total, ' +
+    'SUM("isTracking"::int) as tracking, ' +
     'SUM("isActive"::int) as active, ' +
     'SUM("isIgnored"::int) as ignored ' +
     'FROM "Listing" ' +
@@ -32,7 +32,7 @@ async function getCategoryStats() {
             total: number;
         }
     > = new Map();
-    
+
     const statsRaw: {
         categoryId: number;
         total: bigint;
@@ -69,6 +69,19 @@ export function registerCategoryRoutes() {
         });
 
         const stats = await getCategoryStats();
+        const total = [...stats.values()].reduce((total, current) => {
+            return {
+                ignoredCount: current.ignored + total.ignoredCount,
+                trackingCount: current.tracking + total.trackingCount,
+                activeCount: current.active + total.activeCount,
+                totalCount: current.total + total.totalCount
+            }
+        }, {
+            ignoredCount: 0,
+            trackingCount: 0,
+            totalCount: 0,
+            activeCount: 0,
+        });
 
         return reply.code(200).send({
             categories: categories.map((c) => {
@@ -88,10 +101,11 @@ export function registerCategoryRoutes() {
                     ...c,
                     ignoredCount: stat.ignored,
                     trackingCount: stat.tracking,
-                    totalCount: stat.total,
                     activeCount: stat.active,
+                    totalCount: stat.total,
                 }
-            })
+            }),
+            total: total
         });
     });
 
