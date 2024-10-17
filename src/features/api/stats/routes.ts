@@ -1,5 +1,5 @@
 import { app, prisma } from "@/index";
-import { Prisma, WordType } from "@prisma/client";
+import { WordType } from "@prisma/client";
 
 export function registerStatRoutes() {
     app.get('/api/stats', {
@@ -19,15 +19,19 @@ export function registerStatRoutes() {
         });
 
         const ignoredBrandCount = await prisma.blockedBrand.count();
+        const summaryListingCount = await prisma.listing.count();
 
         return reply.code(200).send({
             words: {
                 ignoredCount: ignoredWordCount,
                 trackedCount: trackedWordCount
             },
+            listings: {
+                summary: summaryListingCount,
+            },
             brands: {
                 ignoredCount: ignoredBrandCount
-            }
+            },
         });
     });
 }

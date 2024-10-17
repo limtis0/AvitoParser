@@ -13,44 +13,40 @@ const paramsSchema = {
     }
 };
 
+const statsQuery = 'SELECT ' + 
+    '"categoryId", ' + 
+    'COUNT(*) as total, ' + 
+    'SUM("isTracking"::int) as tracking, ' + 
+    'SUM("isActive"::int) as active, ' +
+    'SUM("isIgnored"::int) as ignored ' +
+    'FROM "Listing" ' +
+    'GROUP BY "categoryId";';
+
 async function getCategoryStats() {
     const stats: Map<
-        number, {
-            ignored: number,
-            tracking: number
+        number,
+        {
+            ignored: number;
+            tracking: number;
+            active: number;
+            total: number;
         }
     > = new Map();
+    
+    const statsRaw: {
+        categoryId: number;
+        total: bigint;
+        tracking: bigint;
+        active: bigint;
+        ignored: bigint;
+    }[] = await prisma.$queryRawUnsafe(statsQuery);
 
-    const trackingCount = await prisma.listing.groupBy({
-        by: ['categoryId'],
-        _count: true,
-        where: {
-            isTracking: true
-        }
-    });
-
-    trackingCount.forEach((c) => {
-        stats.set(c.categoryId, {
-            tracking: c._count,
-            ignored: 0
-        })
-    });
-
-    // Same for ignored
-    const ignoredCount = await prisma.listing.groupBy({
-        by: ['categoryId'],
-        _count: true,
-        where: {
-            isIgnored: true
-        }
-    });
-
-    ignoredCount.forEach((c) => {
-        const stat = stats.get(c.categoryId);
-
-        stats.set(c.categoryId, {
-            tracking: stat ? stat.tracking : 0,
-            ignored: c._count
+    statsRaw.forEach((s) => {
+        stats.set(s.categoryId, {
+            tracking: Number(s.tracking),
+            ignored: Number(s.ignored),
+            active: Number(s.active),
+            total: Number(s.total),
         });
     });
 
@@ -78,10 +74,22 @@ export function registerCategoryRoutes() {
             categories: categories.map((c) => {
                 const stat = stats.get(c.id);
 
+                if (stat === undefined) {
+                    return {
+                        ...c,
+                        ignoredCount: 0,
+                        trackingCount: 0,
+                        totalCount: 0,
+                        activeCount: 0,
+                    }
+                }
+
                 return {
                     ...c,
-                    ignoredCount: stat?.ignored ?? 0,
-                    trackingCount: stat?.tracking ?? 0
+                    ignoredCount: stat.ignored,
+                    trackingCount: stat.tracking,
+                    totalCount: stat.total,
+                    activeCount: stat.active,
                 }
             })
         });

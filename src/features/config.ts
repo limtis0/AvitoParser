@@ -4,7 +4,6 @@ const schema = {
     auth: {
         type: 'object',
         properties: {
-            username: { type: 'string', minLength: 1, maxLength: 32, default: 'admin' },
             passwordHash: { type: ['string', 'null'], default: null },
             apiKey: { type: ['string', 'null'], default: null }
         }
@@ -21,7 +20,6 @@ const schema = {
 
 interface IConfig {
     auth: {
-        username: string,
         passwordHash: string | null,
         apiKey: string | null,
     },

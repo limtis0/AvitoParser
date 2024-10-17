@@ -37,16 +37,14 @@ export default function registerAuthRoutes() {
 
     app.post<{
         Body: {
-            username: string;
             password: string;
         }
     }>('/api/user/signIn', {
         schema: {
             body: {
                 type: 'object',
-                required: ['username', 'password'],
+                required: ['password'],
                 properties: {
-                    username: { type: 'string' },
                     password: { type: 'string' }
                 }
             }
@@ -60,10 +58,10 @@ export default function registerAuthRoutes() {
             });
         }
 
-        const { username, password } = request.body;
+        const { password } = request.body;
         const correctPassword = await argon2.verify(auth.passwordHash, password);
 
-        if (username !== auth.username || !correctPassword) {
+        if (!correctPassword) {
             return reply.code(401).send({
                 error: 'Неверные данные'
             });
