@@ -12,8 +12,9 @@ const schema = {
         type: 'object',
         properties: {
             maxPages: { type: 'number', minimum: 1, maximum: 100, default: 3 },
-            listingsIntervalMS: { type: 'number', minimum: 1, default: 30e3 },
-            categoryIntervalMS: { type: 'number', minimum: 1, default: 5e3 }
+            listingsIntervalMS: { type: 'number', minimum: 1, default: 5e3 },
+            listingCheckAfterMS: { type: 'number', minimum: 1, default: 900e3 },
+            categoryIntervalMS: { type: 'number', minimum: 1, default: 30e3 }
         }
     }
 }
@@ -26,6 +27,7 @@ interface IConfig {
     parser: {
         maxPages: number,
         listingsIntervalMS: number,
+        listingCheckAfterMS: number,
         categoryIntervalMS: number,
     }
 };

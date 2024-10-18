@@ -124,7 +124,7 @@ export default class AvitoParser {
 
             if (brand) {
                 const match = brand.match(Regex.brandUrl);
-                
+
                 if (match === null || match[1] === undefined) {
                     console.error(`Could not match brandUrl with regex ${brand}`);
                     brand = null;
@@ -210,12 +210,28 @@ export default class AvitoParser {
 
         await ratingsButton.$click();
 
-        const ratingsRequest = await tab.waitForResource({
-            url: Regex.userIdUrl,
-            type: 'Fetch'
-        });
+        let userId = undefined;
 
-        const userId = ratingsRequest.url.match(Regex.userIdUrl)![1];
+        try {
+            const ratingsRequest = await tab.waitForResource({
+                url: Regex.userIdUrl,
+                type: 'Fetch'
+            }, {
+                timeoutMs: 5000,
+                throwIfTimeout: true
+            });
+
+            const userIdMatch = ratingsRequest.url.match(Regex.userIdUrl);
+
+            if (userIdMatch !== null && userIdMatch[1] !== undefined) {
+                if (ratingsRequest.url) {
+                    console.log(`Could not match ${ratingsRequest.url} to regex`);
+                }
+
+                userId = userIdMatch[1];
+            }
+        }
+        catch (error) { }
 
         // Close browser
         if (newHero) {
@@ -225,7 +241,7 @@ export default class AvitoParser {
         return {
             title: evaluated.title,
             price: evaluated.price ? Number(evaluated.price) : 0,
-            adrress: evaluated.address,
+            address: evaluated.address,
             userId: userId,
         }
     }

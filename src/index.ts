@@ -11,6 +11,7 @@ import { loadWordlistCaches } from "./features/api/wordlist/wordlists";
 import { registerCategoryRoutes } from "./features/api/categories/routes";
 import { registerBrandlistRoutes } from "./features/api/wordlist/brandlistRoutes";
 import { registerStatRoutes } from "./features/api/stats/routes";
+import AvitoListingService from "./features/avitoParser/services/avitoListingService";
 
 export const prisma = new PrismaClient();
 export let app: FastifyInstance;
@@ -23,6 +24,7 @@ async function startServer() {
     // Load parsers
     await HeroProvider.startCloudNode();
     AvitoCategoryService.Start();
+    AvitoListingService.Start();
 
     // Setup API
     app = Fastify();

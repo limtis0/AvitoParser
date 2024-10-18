@@ -25,7 +25,7 @@ export default class AvitoCategoryService {
             });
 
             if (categories.length === 0) {
-                setTimeout(() => { this.loop() }, config.store.parser.listingsIntervalMS);
+                setTimeout(() => { this.loop() }, config.store.parser.categoryIntervalMS);
                 return;
             }
 
@@ -65,7 +65,7 @@ export default class AvitoCategoryService {
             console.error(`! Error in newListingsLoop: ${error}`);
         }
         finally {
-            setTimeout(() => { this.loop() }, config.store.parser.listingsIntervalMS);
+            setTimeout(() => { this.loop() }, config.store.parser.categoryIntervalMS);
         }
     }
 
@@ -79,6 +79,7 @@ export default class AvitoCategoryService {
         catch (error) {
             if (error instanceof FirewallError) {
                 console.error(`IP has been locked, waiting for rotation...`);  // TODO: Add handler
+                await sleep(config.store.parser.categoryIntervalMS);
             }
             else {
                 console.error(`Error while parsing category: ${error}`);
