@@ -68,7 +68,7 @@ export default class AvitoListingService {
                 catch (error) {
                     if (error instanceof FirewallError) {
                         console.error(`IP has been locked, waiting for rotation...`);
-                        await sleep(config.store.parser.listingsIntervalMS * 4);
+                        await sleep(config.store.proxy.rotationIntervalMS);
                         continue;
                     }
                     else {

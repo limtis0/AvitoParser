@@ -1,3 +1,4 @@
+import { config } from "@/features/config";
 import CloudNode from "@ulixee/cloud";
 import Hero from "@ulixee/hero";
 
@@ -10,10 +11,10 @@ export default class HeroProvider {
         await this.node.listen();
     }
 
-    // TODO: Proxy
     public static newHero() {
         return new Hero({
-            showChrome: false
+            showChrome: false,
+            upstreamProxyUrl: config.store.proxy.connectionUrl ?? undefined
         });
     }
 

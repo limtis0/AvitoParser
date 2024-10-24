@@ -16,6 +16,13 @@ const schema = {
             listingCheckAfterMS: { type: 'number', minimum: 1, default: 900e3 },
             categoryIntervalMS: { type: 'number', minimum: 1, default: 30e3 }
         }
+    },
+    proxy: {
+        type: 'object',
+        properties: {
+            connectionUrl: { type: ['string', 'null'], default: null },
+            rotationIntervalMS: { type: 'number', minimum: 1000, default: 60e3 }
+        }
     }
 }
 
@@ -29,6 +36,10 @@ interface IConfig {
         listingsIntervalMS: number,
         listingCheckAfterMS: number,
         categoryIntervalMS: number,
+    },
+    proxy: {
+        connectionUrl: string | null,
+        rotationIntervalMS: number
     }
 };
 

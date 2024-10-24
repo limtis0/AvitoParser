@@ -78,8 +78,8 @@ export default class AvitoCategoryService {
         }
         catch (error) {
             if (error instanceof FirewallError) {
-                console.error(`IP has been locked, waiting for rotation...`);  // TODO: Add handler
-                await sleep(config.store.parser.categoryIntervalMS);
+                console.error(`IP has been locked, waiting for rotation...`);
+                await sleep(config.store.proxy.rotationIntervalMS);
             }
             else {
                 console.error(`Error while parsing category: ${error}`);
