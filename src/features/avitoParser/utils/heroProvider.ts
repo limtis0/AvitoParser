@@ -13,7 +13,7 @@ export default class HeroProvider {
     // TODO: Proxy
     public static newHero() {
         return new Hero({
-            showChrome: true
+            showChrome: false
         });
     }
 
