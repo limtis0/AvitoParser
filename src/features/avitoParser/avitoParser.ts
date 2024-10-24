@@ -30,7 +30,7 @@ const ListingSelectors = {
 
 const Regex = {
     brandUrl: /(?:brands|user)\/([a-zA-Z0-9]+)/,
-    userIdUrl: /user\/([a-zA-Z0-9]+)\/ratings/
+    userIdUrl: /([a-zA-Z0-9]+)\/ratings/
 }
 
 export class FirewallError extends Error {
@@ -154,7 +154,7 @@ export default class AvitoParser {
         return result;
     }
 
-    public static async parseItem(pageUrl: string, hero?: Hero) {
+    public static async parseItem(pageUrl: string, hero?: Hero, getUserId: boolean = false) {
         const newHero = !hero;
 
         if (!hero) {
@@ -197,41 +197,43 @@ export default class AvitoParser {
             address: await selected.address.innerText
         }
 
-        // Get userId from rating request
-        const tab = hero.activeTab;
-
-        const ratingsButton = await hero.waitForElement(hero.querySelector(ListingSelectors.ratings), {
-            waitForClickable: true
-        });
-
-        if (!ratingsButton) {
-            throw new Error('Rating button is not found');
-        }
-
-        await ratingsButton.$click();
-
         let userId = undefined;
 
-        try {
-            const ratingsRequest = await tab.waitForResource({
-                url: Regex.userIdUrl,
-                type: 'Fetch'
-            }, {
-                timeoutMs: 5000,
-                throwIfTimeout: true
-            });
+        if (getUserId) {
+            try {
+                // Get userId from rating request
+                const tab = hero.activeTab;
 
-            const userIdMatch = ratingsRequest.url.match(Regex.userIdUrl);
+                const ratingsButton = await hero.waitForElement(hero.querySelector(ListingSelectors.ratings), {
+                    waitForClickable: true
+                });
 
-            if (userIdMatch !== null && userIdMatch[1] !== undefined) {
-                if (ratingsRequest.url) {
-                    console.log(`Could not match ${ratingsRequest.url} to regex`);
+                if (!ratingsButton) {
+                    throw new Error('Rating button is not found');
                 }
 
-                userId = userIdMatch[1];
+                await ratingsButton.$click();
+
+                const ratingsRequest = await tab.waitForResource({
+                    url: Regex.userIdUrl,
+                    type: 'Fetch'
+                }, {
+                    timeoutMs: 5000,
+                    throwIfTimeout: true
+                });
+
+                const userIdMatch = ratingsRequest.url.match(Regex.userIdUrl);
+
+                if (userIdMatch !== null && userIdMatch[1] !== undefined) {
+                    if (ratingsRequest.url) {
+                        console.log(`Could not match ratingsUrl ${ratingsRequest.url} to regex`);
+                    }
+
+                    userId = userIdMatch[1];
+                }
             }
+            catch (error) { }
         }
-        catch (error) { }
 
         // Close browser
         if (newHero) {
