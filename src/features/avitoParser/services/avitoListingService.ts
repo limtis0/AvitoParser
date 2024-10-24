@@ -38,6 +38,8 @@ export default class AvitoListingService {
             const hero = HeroProvider.newHero();
 
             for (const listing of listings) {
+                console.log(`> Checking listing ${listing.id}`);
+                
                 try {
                     const info = await AvitoParser.parseItem(listing.url, hero);
 

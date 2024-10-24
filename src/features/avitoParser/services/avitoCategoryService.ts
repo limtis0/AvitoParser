@@ -32,6 +32,8 @@ export default class AvitoCategoryService {
             const hero = HeroProvider.newHero();
 
             for (const category of categories) {
+                console.log(`> Parsing category ${category.name}`);
+
                 for (let page = 1; page <= config.store.parser.maxPages; page++) {
                     const pageUrl = AvitoUrlUtils.getCategory(category.url, {
                         page: page,
@@ -78,7 +80,7 @@ export default class AvitoCategoryService {
         }
         catch (error) {
             if (error instanceof FirewallError) {
-                console.error(`IP has been locked, waiting for rotation...`);
+                console.error(`! IP has been locked, waiting for rotation...`);
                 await sleep(config.store.proxy.rotationIntervalMS);
             }
             else {

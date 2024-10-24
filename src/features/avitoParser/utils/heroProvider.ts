@@ -14,6 +14,8 @@ export default class HeroProvider {
     public static newHero() {
         return new Hero({
             showChrome: false,
+            disableGpu: true,
+            noChromeSandbox: true,
             upstreamProxyUrl: config.store.proxy.connectionUrl ?? undefined
         });
     }
