@@ -6,12 +6,13 @@ import HeroProvider from "../utils/heroProvider";
 import AvitoUrlUtils from "../../../utils/avitoUrlUtils";
 import { setTimeout as sleep } from 'timers/promises'
 import { isTextInWordlist, ignoredWordlist, trackedWordlist, ignoredBrandlist } from "@/features/api/wordlist/wordlists";
+import { setIntervalAsync } from "set-interval-async/fixed";
 
 export default class AvitoCategoryService {
     private static readonly SkipOnNumDuplicates = 20;
 
     static Start() {
-        this.loop();
+        setIntervalAsync(() => this.loop(), config.store.parser.categoryIntervalMS)
     }
 
     private static async loop() {
@@ -25,7 +26,7 @@ export default class AvitoCategoryService {
             });
 
             if (categories.length === 0) {
-                setTimeout(() => { this.loop() }, config.store.parser.categoryIntervalMS);
+                await sleep(config.store.parser.categoryIntervalMS);
                 return;
             }
 
@@ -67,7 +68,7 @@ export default class AvitoCategoryService {
             console.error(`! Error in newListingsLoop: ${error}`);
         }
         finally {
-            setTimeout(() => { this.loop() }, config.store.parser.categoryIntervalMS);
+            await sleep(config.store.parser.categoryIntervalMS);
         }
     }
 

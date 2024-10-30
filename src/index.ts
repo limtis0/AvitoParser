@@ -12,12 +12,16 @@ import { registerCategoryRoutes } from "./features/api/categories/routes";
 import { registerBrandlistRoutes } from "./features/api/wordlist/brandlistRoutes";
 import { registerStatRoutes } from "./features/api/stats/routes";
 import AvitoListingService from "./features/avitoParser/services/avitoListingService";
+import events from 'events';
 
 export const prisma = new PrismaClient();
 export let app: FastifyInstance;
 
 // Start parser
 async function startServer() {
+    // Set max listeners to a bigger amount, idk why this triggers
+    events.defaultMaxListeners = 64;
+
     // Load caches
     await loadWordlistCaches();
 

@@ -3,10 +3,11 @@ import AvitoParser, { FirewallError } from "../avitoParser";
 import { config } from "../../config";
 import HeroProvider from "../utils/heroProvider";
 import { setTimeout as sleep } from 'timers/promises';
+import { setIntervalAsync } from "set-interval-async/fixed";
 
 export default class AvitoListingService {
     static Start() {
-        this.trackingLoop();
+        setIntervalAsync(() => this.trackingLoop(), config.store.parser.listingsIntervalMS);
     }
 
     private static async trackingLoop() {
@@ -31,7 +32,8 @@ export default class AvitoListingService {
             });
 
             if (listings.length === 0) {
-                setTimeout(() => { this.trackingLoop() }, config.store.parser.listingsIntervalMS);
+                console.log('> No tracking listings to update, waiting...')
+                await sleep(config.store.parser.listingsIntervalMS);
                 return;
             }
 
@@ -87,7 +89,7 @@ export default class AvitoListingService {
             console.error(`! Error in newListingsLoop: ${error}`);
         }
         finally {
-            setTimeout(() => { this.trackingLoop() }, config.store.parser.listingsIntervalMS);
+            await sleep(config.store.parser.listingsIntervalMS);
         }
     }
 }

@@ -49,7 +49,9 @@ export default class AvitoParser {
         }
 
         // Load page
-        await hero.goto(pageUrl);
+        await hero.goto(pageUrl, {
+            timeoutMs: 5000
+        });
 
         // Check for IP block
         const firewall = hero.querySelector(GeneralSelectors.firewall);
@@ -163,7 +165,9 @@ export default class AvitoParser {
 
         pageUrl = AvitoUrlUtils.getAbsolute(pageUrl);
 
-        const navigation = await hero.goto(pageUrl);
+        const navigation = await hero.goto(pageUrl, {
+            timeoutMs: 5000
+        });
 
         // Check for 404
         if (navigation.response.statusCode === 404) {
