@@ -16,7 +16,10 @@ export default class HeroProvider {
             showChrome: false,
             disableGpu: true,
             noChromeSandbox: true,
-            upstreamProxyUrl: config.store.proxy.connectionUrl ?? undefined
+            upstreamProxyUrl: config.store.proxy.connectionUrl ?? undefined,
+            upstreamProxyIpMask: {
+                ipLookupService: 'api.ipify.org'
+            }
         });
     }
 

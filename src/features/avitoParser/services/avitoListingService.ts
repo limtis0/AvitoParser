@@ -32,7 +32,11 @@ export default class AvitoListingService {
             });
 
             if (listings.length === 0) {
-                console.log('> No tracking listings to update, waiting...')
+                // A hack not to print every time
+                if (Date.now() % 8 == 0) {
+                    console.log('> No tracking listings to update, waiting...')
+                }
+
                 await sleep(config.store.parser.listingsIntervalMS);
                 return;
             }
