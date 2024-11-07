@@ -14,8 +14,8 @@ const wordlistParamsSchema = {
     }
 }
 
-function resolveWordlists(wordType: WordType) {
-    if (wordType === WordType.ignored) {
+function resolveWordlists(ignoreWord: boolean) {
+    if (ignoreWord) {
         return {
             mainWordlist: ignoredWordlist,
             subWordlist: trackedWordlist
@@ -26,6 +26,29 @@ function resolveWordlists(wordType: WordType) {
         mainWordlist: trackedWordlist,
         subWordlist: ignoredWordlist
     }
+}
+
+async function updateListings(word: string, ignoreWord: boolean) {
+    return prisma.listing.updateMany({
+        where: {
+            title: {
+                contains: word,
+                mode: 'insensitive'
+            },
+            isIgnored: !ignoreWord
+        },
+        data: {
+            isIgnored: ignoreWord
+        }
+    }).then((result) => {
+        console.log(
+            `${ignoreWord ? 'Ignored' : 'Unignored'} ${result.count} listings with word ${word}`
+        );
+    }).catch((error) => {
+        console.error(
+            `Error while updating listings with word ${word}: ${error}`
+        );
+    });
 }
 
 export function registerWordlistRoutes() {
@@ -101,8 +124,9 @@ export function registerWordlistRoutes() {
     }, async (request, reply) => {
         const word = request.body.word.toLowerCase();
         const wordType = request.params.wordType;
+        const ignoreWord = wordType === WordType.ignored;
 
-        const { mainWordlist, subWordlist } = resolveWordlists(wordType);
+        const { mainWordlist, subWordlist } = resolveWordlists(ignoreWord);
 
         // Check for conflicts
         if (mainWordlist.has(word)) {
@@ -113,7 +137,7 @@ export function registerWordlistRoutes() {
 
         if (subWordlist.has(word)) {
             return reply.code(409).send({
-                error: `Это слово уже ${wordType === WordType.ignored ? 'игнорируется' : 'отслеживается'}`
+                error: `Это слово уже ${ignoreWord ? 'отслеживается' : 'игнорируется'}`
             });
         }
 
@@ -125,7 +149,11 @@ export function registerWordlistRoutes() {
             }
         });
 
+        // Add to wordlist
         mainWordlist.add(word);
+
+        // Update existing entries
+        await updateListings(word, ignoreWord);
 
         return reply.code(200).send();
     });
@@ -154,8 +182,9 @@ export function registerWordlistRoutes() {
     }, async (request, reply) => {
         const words = request.query.word.map(w => w.toLowerCase());
         const wordType = request.params.wordType;
+        const fromIgnored = wordType === WordType.ignored;
 
-        const { mainWordlist } = resolveWordlists(wordType);
+        const { mainWordlist } = resolveWordlists(fromIgnored);
 
         // Delete in DB and cache
         await prisma.word.deleteMany({
@@ -167,7 +196,17 @@ export function registerWordlistRoutes() {
             }
         });
 
-        words.forEach(w => mainWordlist.delete(w));
+        if (fromIgnored) {
+            const promises = words.map(async (w) => {
+                mainWordlist.delete(w);
+                return updateListings(w, false)
+            });
+
+            await Promise.all(promises);
+        }
+        else {
+            words.forEach(w => mainWordlist.delete(w));
+        }
 
         return reply.code(200).send();
     });

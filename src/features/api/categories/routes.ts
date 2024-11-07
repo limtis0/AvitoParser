@@ -17,7 +17,7 @@ const statsQuery = 'SELECT ' +
     '"categoryId", ' +
     'COUNT(*) as total, ' +
     'SUM("isTracking"::int) as tracking, ' +
-    'SUM("isActive"::int) as active, ' +
+    'SUM(("isActive" AND NOT "isIgnored")::int) as active, ' +
     'SUM("isIgnored"::int) as ignored ' +
     'FROM "Listing" ' +
     'GROUP BY "categoryId";';

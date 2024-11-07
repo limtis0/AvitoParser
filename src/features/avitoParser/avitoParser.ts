@@ -195,10 +195,16 @@ export default class AvitoParser {
             address: hero.querySelector(ListingSelectors.address)
         };
 
+        console.log(`Evaluating ${pageUrl}`);
+        console.log(`Title:`)
+        console.log(await selected.title.innerText);
+        console.log(`Address:`)
+        console.log(await selected.address.$exists ? await selected.address.innerText : undefined);
+
         const evaluated = {
             title: await selected.title.innerText,
             price: await selected.price.getAttribute('content'),
-            address: await selected.address.innerText
+            address: await selected.address.$exists ? await selected.address.innerText : undefined
         }
 
         let userId = undefined;

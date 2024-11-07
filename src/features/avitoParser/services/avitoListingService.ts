@@ -41,11 +41,14 @@ export default class AvitoListingService {
                 return;
             }
 
-            const hero = HeroProvider.newHero();
+            // Sort an array not to be stuck on the same listing
+            listings.sort(() => .5 - Math.random());
+
+            const hero = HeroProvider.newHero({ withProxy: true });
 
             for (const listing of listings) {
                 console.log(`> Checking listing ${listing.id}`);
-                
+
                 try {
                     const info = await AvitoParser.parseItem(listing.url, hero);
 
