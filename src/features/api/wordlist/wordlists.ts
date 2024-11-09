@@ -30,6 +30,9 @@ async function loadWordlists() {
             trackedWordlist.add(word);
         }
     });
+
+    console.log(`"Ignore" Wordlist is loaded (${ignoredWordlist.size} entries)`);
+    console.log(`"Track" Wordlist is loaded (${trackedWordlist.size} entries)`);
 }
 
 async function loadBrandlist() {
@@ -43,7 +46,7 @@ async function loadBrandlist() {
 }
 
 export function isTextInWordlist(text: string, wordlist: Set<string>) {
-    const words = text.trim().split(/\s{1,}/g);
+    const words = text.replace(/[^А-Яа-яA-Za-z\s]/, ' ').trim().split(/\s+/g);
     return words.some(w => wordlist.has(w.toLowerCase()));
 }
 

@@ -109,9 +109,8 @@ export default class AvitoCategoryService {
 
         let data = listings.map(l => {
             const isTracking = isTextInWordlist(l.title, trackedWordlist);
-            const isIgnored = !isTracking && (
-                isTextInWordlist(l.title, ignoredWordlist) || (l.brand !== null && isTextInWordlist(l.brand, ignoredBrandlist))
-            );
+            const isIgnored = isTextInWordlist(l.title, ignoredWordlist)
+                || (l.brand !== null && ignoredBrandlist.has(l.brand.toLowerCase()));
 
             return {
                 ...l,
