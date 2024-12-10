@@ -86,6 +86,20 @@ export function registerBrandlistRoutes() {
             }
         });
 
+        // Ignore previous listings of a brand
+        await prisma.listing.updateMany({
+            where: {
+                brand: {
+                    equals: name,
+                    mode: 'insensitive'
+                },
+                isIgnored: false
+            },
+            data: {
+                isIgnored: true
+            }
+        });
+
         ignoredBrandlist.add(name);
 
         return reply.code(200).send();

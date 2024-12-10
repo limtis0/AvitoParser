@@ -23,6 +23,8 @@ async function loadWordlists() {
 
     // Load into cache
     words.forEach(({ word, type }) => {
+        word = word.toLowerCase();
+        
         if (type === WordType.ignored) {
             ignoredWordlist.add(word);
         }
@@ -46,7 +48,10 @@ async function loadBrandlist() {
 }
 
 export function isTextInWordlist(text: string, wordlist: Set<string>) {
-    const words = text.replace(/[^А-Яа-яA-Za-z\s]/, ' ').trim().split(/\s+/g);
-    return words.some(w => wordlist.has(w.toLowerCase()));
+    const words = text
+        .replace(/[^А-Яа-яA-Za-z\s]/g, ' ') // Replace all non-word characters
+        .trim()
+        .split(/\s+/); // Split by one or more spaces
+    return words.some(w => wordlist.has(w.toLowerCase())); // Check case-insensitively
 }
 
